@@ -6,7 +6,7 @@ sbit lcd_rs=P2^2;
 sbit lcd_rw=P2^3;
 sbit lcd_en=P2^4;
 
-uchar table1[]=" i love you";
+uchar table1[]=" i love you ";
 uchar table2[]=" heluyao ";
 void delay50us(uint t)   //?? 0us
 {
