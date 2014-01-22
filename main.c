@@ -20,7 +20,7 @@ void writecom(uchar com)
 	lcd_en=0;
 	lcd_rs=0;
 	lcd_rw=0;
-	P3=com;
+	P0=com;
 	delay50us(1);
 	lcd_en=1;
 	delay50us(15);
@@ -32,7 +32,7 @@ void writedate(uchar date)
 	lcd_en=0;
 	lcd_rs=1;
 	lcd_rw=0;
-	P3=date;
+	P0=date;
 	delay50us(1);
 	lcd_en=1;
 	delay50us(15);
