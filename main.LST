@@ -1,0 +1,180 @@
+C51 COMPILER V9.51   MAIN                                                                  01/22/2014 23:11:50 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\hex\main.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND OBJECT(.\hex\main.obj)
+
+line level    source
+
+   1          #include<reg52.h>
+   2          #include<string.h>
+   3          #define uchar unsigned char
+   4          #define uint unsigned int
+   5          sbit lcd_rs=P2^2;
+   6          sbit lcd_rw=P2^3;
+   7          sbit lcd_en=P2^4;
+   8          
+   9          uchar table1[]=" i love you ";
+  10          uchar table2[]=" heluyao ";
+  11          void delay50us(uint t)   //?? 0us
+  12          {
+  13   1          unsigned char a,b;
+  14   1          for(b=t;b>0;b--)
+  15   1              for(a=22;a>0;a--);
+  16   1      }
+  17          
+  18          void writecom(uchar com)
+  19          {
+  20   1              lcd_en=0;
+  21   1              lcd_rs=0;
+  22   1              lcd_rw=0;
+  23   1              P3=com;
+  24   1              delay50us(1);
+  25   1              lcd_en=1;
+  26   1              delay50us(15);
+  27   1              lcd_en=0;
+  28   1      }
+  29          
+  30          void writedate(uchar date)
+  31          {
+  32   1              lcd_en=0;
+  33   1              lcd_rs=1;
+  34   1              lcd_rw=0;
+  35   1              P3=date;
+  36   1              delay50us(1);
+  37   1              lcd_en=1;
+  38   1              delay50us(15);
+  39   1              lcd_en=0;       
+  40   1      }
+  41          
+  42          void init ()
+  43          {
+  44   1              delay50us(300);
+  45   1              writecom(0x38);
+  46   1              delay50us(100);
+  47   1              writecom(0x38);
+  48   1              delay50us(100);
+  49   1              writecom(0x38);
+  50   1              writecom(0x38);
+  51   1              writecom(0x08);
+  52   1              writecom(0x01);
+  53   1          writecom(0x06);
+  54   1              writecom(0x0c);
+  55   1              
+C51 COMPILER V9.51   MAIN                                                                  01/22/2014 23:11:50 PAGE 2   
+
+  56   1      }
+  57          
+  58          
+  59          
+  60          void DisPlay_char(int x,int y,char ch);
+  61          void Display_str(int x,int y,char* pstr);
+  62          
+  63          void main()
+  64          {
+  65   1              uchar j;
+  66   1              init();
+  67   1              writecom(0x80);
+  68   1              for(j=0;j<16;j++)
+  69   1      
+  70   1              {
+  71   2                      writedate(table1[j]);
+  72   2                      delay50us(10);
+  73   2              }
+  74   1              writecom(0x80+0x40);
+  75   1              for(j=0;j<16;j++)
+  76   1              {
+  77   2                      writedate(table2[j]);
+  78   2                      delay50us(10);
+  79   2              }
+  80   1          
+  81   1          Display_str(0,0,"this is test!!!more char!!");
+  82   1              while(1);
+  83   1      
+  84   1      }
+  85          
+  86          
+  87          void DisPlay_char(int x,int y,char ch)
+  88          {
+  89   1              int a=0;
+  90   1              if(y>0)
+  91   1              {
+  92   2                      a = 0x40;
+  93   2              }
+  94   1              a = a+x;
+  95   1              writecom(0x80+a);
+  96   1              writedate(ch);
+  97   1              delay50us(10);
+  98   1      }
+  99          
+ 100          void Display_str(int x,int y,char* pstr)
+ 101          {
+ 102   1              int a=0;
+ 103   1              int str_len=0;
+ 104   1              int first_line_display_cnt=0;
+ 105   1              int second_line_display_cnt=0;
+ 106   1              int i=0;
+ 107   1              int temp=0;
+ 108   1      
+ 109   1              if(y==0)
+ 110   1              {
+ 111   2                      first_line_display_cnt = 16-x;
+ 112   2                      str_len = strlen(pstr);
+ 113   2                      if(first_line_display_cnt>=str_len) 
+ 114   2                      {
+ 115   3                              for(i=0;i<str_len;i++)
+ 116   3                              {
+ 117   4                                      DisPlay_char(x+i,y,pstr[i]);
+C51 COMPILER V9.51   MAIN                                                                  01/22/2014 23:11:50 PAGE 3   
+
+ 118   4                              }
+ 119   3                      }
+ 120   2                      else
+ 121   2                      {
+ 122   3      
+ 123   3                              second_line_display_cnt = str_len - i;
+ 124   3                              temp = i;
+ 125   3              
+ 126   3                              if(second_line_display_cnt>16)
+ 127   3                              {
+ 128   4                                      second_line_display_cnt = 16;
+ 129   4                              }
+ 130   3                              for(i=0;i<second_line_display_cnt;i++)
+ 131   3                              {
+ 132   4                                      DisPlay_char(i,y+1,pstr[i+temp]);
+ 133   4                              }
+ 134   3                              
+ 135   3                      }
+ 136   2              }
+ 137   1              
+ 138   1              else 
+ 139   1              {
+ 140   2                      second_line_display_cnt = 16-x;
+ 141   2                      str_len = strlen(pstr);
+ 142   2                      if(first_line_display_cnt>=str_len) 
+ 143   2                      {
+ 144   3                              first_line_display_cnt = str_len;
+ 145   3                      }
+ 146   2                      
+ 147   2                      for(i=0;i<first_line_display_cnt;i++)
+ 148   2                      {
+ 149   3                              DisPlay_char(x+i,y,pstr[i]);
+ 150   3                      }
+ 151   2              }
+ 152   1              
+ 153   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    562    ----
+   CONSTANT SIZE    =     27    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     23      19
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
