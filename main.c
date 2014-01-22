@@ -64,6 +64,7 @@ void main()
 {
 	uchar j;
 	init();
+    /*
 	writecom(0x80);
 	for(j=0;j<16;j++)
 
@@ -77,8 +78,9 @@ void main()
 		writedate(table2[j]);
 		delay50us(10);
 	}
-    
+    */
     Display_str(0,0,"this is test!!!more char!!");
+    //Display_str(0,0,table1);
 	while(1);
 
 }
@@ -97,6 +99,8 @@ void DisPlay_char(int x,int y,char ch)
 	delay50us(10);
 }
 
+//test
+
 void Display_str(int x,int y,char* pstr)
 {
 	int a=0;
@@ -112,41 +116,50 @@ void Display_str(int x,int y,char* pstr)
 		str_len = strlen(pstr);
 		if(first_line_display_cnt>=str_len) 
 		{
-			for(i=0;i<str_len;i++)
-			{
-				DisPlay_char(x+i,y,pstr[i]);
-			}
+            first_line_display_cnt = str_len;
 		}
-		else
-		{
-
-			second_line_display_cnt = str_len - i;
-			temp = i;
-	
-			if(second_line_display_cnt>16)
-			{
-				second_line_display_cnt = 16;
-			}
-			for(i=0;i<second_line_display_cnt;i++)
-			{
-				DisPlay_char(i,y+1,pstr[i+temp]);
-			}
-			
-		}
-	}
-	
-	else 
+        //显示第一行
+        for(i=0;i<first_line_display_cnt;i++)
+        {
+            DisPlay_char(x+i,0,pstr[i]);
+        }
+        
+        temp = i;
+        first_line_display_cnt = 16-x;
+        str_len = strlen(pstr);
+        if(first_line_display_cnt<str_len)//一行显示不下
+        {
+            //计算余下多少
+            second_line_display_cnt = str_len-temp;//temp就是i是上面一直++的，所以知道已经显示到哪里了
+            //判断第二行是否超出，超出部分舍弃
+            if(second_line_display_cnt>16)
+            {
+                second_line_display_cnt = 16; 
+            }
+            
+            //显示第二行
+            for(i=0;i<second_line_display_cnt;i++)
+            {
+                DisPlay_char(i,1,pstr[temp+i]);//接着没显示完的显示，并且从第二行的第0列显示
+            }
+        }
+    } 	
+	else //直接就显示第二行
 	{
 		second_line_display_cnt = 16-x;
 		str_len = strlen(pstr);
-		if(first_line_display_cnt>=str_len) 
+		if(second_line_display_cnt>=str_len) //如果显示有多余的
 		{
-			first_line_display_cnt = str_len;
+			second_line_display_cnt = str_len;//显示长度就直接是字符串长度
 		}
+        else//如果显示不下，其实这个else可以不要，因为上面已经计算显示的最大宽度，为了便于理解
+        {
+            second_line_display_cnt = second_line_display_cnt;//我就只能显示这么多了
+        }
 		
-		for(i=0;i<first_line_display_cnt;i++)
+		for(i=0;i<second_line_display_cnt;i++)
 		{
-			DisPlay_char(x+i,y,pstr[i]);
+			DisPlay_char(x+i,1,pstr[i]);
 		}
 	}
 	

@@ -1,4 +1,4 @@
-C51 COMPILER V9.51   MAIN                                                                  01/22/2014 23:11:50 PAGE 1   
+C51 COMPILER V9.51   MAIN                                                                  01/23/2014 00:38:32 PAGE 1   
 
 
 C51 COMPILER V9.51, COMPILATION OF MODULE MAIN
@@ -62,7 +62,7 @@ line level    source
   53   1          writecom(0x06);
   54   1              writecom(0x0c);
   55   1              
-C51 COMPILER V9.51   MAIN                                                                  01/22/2014 23:11:50 PAGE 2   
+C51 COMPILER V9.51   MAIN                                                                  01/23/2014 00:38:32 PAGE 2   
 
   56   1      }
   57          
@@ -75,106 +75,120 @@ line level    source
   64          {
   65   1              uchar j;
   66   1              init();
-  67   1              writecom(0x80);
-  68   1              for(j=0;j<16;j++)
-  69   1      
-  70   1              {
-  71   2                      writedate(table1[j]);
-  72   2                      delay50us(10);
-  73   2              }
-  74   1              writecom(0x80+0x40);
-  75   1              for(j=0;j<16;j++)
-  76   1              {
-  77   2                      writedate(table2[j]);
-  78   2                      delay50us(10);
-  79   2              }
-  80   1          
-  81   1          Display_str(0,0,"this is test!!!more char!!");
-  82   1              while(1);
-  83   1      
-  84   1      }
-  85          
-  86          
-  87          void DisPlay_char(int x,int y,char ch)
-  88          {
-  89   1              int a=0;
-  90   1              if(y>0)
-  91   1              {
-  92   2                      a = 0x40;
-  93   2              }
-  94   1              a = a+x;
-  95   1              writecom(0x80+a);
-  96   1              writedate(ch);
-  97   1              delay50us(10);
-  98   1      }
-  99          
- 100          void Display_str(int x,int y,char* pstr)
- 101          {
- 102   1              int a=0;
- 103   1              int str_len=0;
- 104   1              int first_line_display_cnt=0;
- 105   1              int second_line_display_cnt=0;
- 106   1              int i=0;
- 107   1              int temp=0;
- 108   1      
- 109   1              if(y==0)
- 110   1              {
- 111   2                      first_line_display_cnt = 16-x;
- 112   2                      str_len = strlen(pstr);
- 113   2                      if(first_line_display_cnt>=str_len) 
- 114   2                      {
- 115   3                              for(i=0;i<str_len;i++)
- 116   3                              {
- 117   4                                      DisPlay_char(x+i,y,pstr[i]);
-C51 COMPILER V9.51   MAIN                                                                  01/22/2014 23:11:50 PAGE 3   
+  67   1          /*
+  68   1              writecom(0x80);
+  69   1              for(j=0;j<16;j++)
+  70   1      
+  71   1              {
+  72   1                      writedate(table1[j]);
+  73   1                      delay50us(10);
+  74   1              }
+  75   1              writecom(0x80+0x40);
+  76   1              for(j=0;j<16;j++)
+  77   1              {
+  78   1                      writedate(table2[j]);
+  79   1                      delay50us(10);
+  80   1              }
+  81   1          */
+  82   1          Display_str(0,0,"this is test!!!more char!!");
+  83   1          //Display_str(0,0,table1);
+  84   1              while(1);
+  85   1      
+  86   1      }
+*** WARNING C280 IN LINE 65 OF main.c: 'j': unreferenced local variable
+  87          
+  88          
+  89          void DisPlay_char(int x,int y,char ch)
+  90          {
+  91   1              int a=0;
+  92   1              if(y>0)
+  93   1              {
+  94   2                      a = 0x40;
+  95   2              }
+  96   1              a = a+x;
+  97   1              writecom(0x80+a);
+  98   1              writedate(ch);
+  99   1              delay50us(10);
+ 100   1      }
+ 101          
+ 102          //test
+ 103          
+ 104          void Display_str(int x,int y,char* pstr)
+ 105          {
+ 106   1              int a=0;
+ 107   1              int str_len=0;
+ 108   1              int first_line_display_cnt=0;
+ 109   1              int second_line_display_cnt=0;
+ 110   1              int i=0;
+ 111   1              int temp=0;
+ 112   1      
+ 113   1              if(y==0)
+ 114   1              {
+ 115   2                      first_line_display_cnt = 16-x;
+ 116   2                      str_len = strlen(pstr);
+C51 COMPILER V9.51   MAIN                                                                  01/23/2014 00:38:32 PAGE 3   
 
- 118   4                              }
- 119   3                      }
- 120   2                      else
- 121   2                      {
- 122   3      
- 123   3                              second_line_display_cnt = str_len - i;
- 124   3                              temp = i;
- 125   3              
- 126   3                              if(second_line_display_cnt>16)
- 127   3                              {
- 128   4                                      second_line_display_cnt = 16;
- 129   4                              }
- 130   3                              for(i=0;i<second_line_display_cnt;i++)
- 131   3                              {
- 132   4                                      DisPlay_char(i,y+1,pstr[i+temp]);
- 133   4                              }
- 134   3                              
- 135   3                      }
- 136   2              }
- 137   1              
- 138   1              else 
- 139   1              {
- 140   2                      second_line_display_cnt = 16-x;
- 141   2                      str_len = strlen(pstr);
- 142   2                      if(first_line_display_cnt>=str_len) 
- 143   2                      {
- 144   3                              first_line_display_cnt = str_len;
- 145   3                      }
- 146   2                      
- 147   2                      for(i=0;i<first_line_display_cnt;i++)
- 148   2                      {
- 149   3                              DisPlay_char(x+i,y,pstr[i]);
- 150   3                      }
- 151   2              }
- 152   1              
- 153   1      }
+ 117   2                      if(first_line_display_cnt>=str_len) 
+ 118   2                      {
+ 119   3                  first_line_display_cnt = str_len;
+ 120   3                      }
+ 121   2              //显示第一行
+ 122   2              for(i=0;i<first_line_display_cnt;i++)
+ 123   2              {
+ 124   3                  DisPlay_char(x+i,0,pstr[i]);
+ 125   3              }
+ 126   2              
+ 127   2              temp = i;
+ 128   2              first_line_display_cnt = 16-x;
+ 129   2              str_len = strlen(pstr);
+ 130   2              if(first_line_display_cnt<str_len)//一行显示不下
+ 131   2              {
+ 132   3                  //计算余下多少
+ 133   3                  second_line_display_cnt = str_len-temp;//temp就是i是上面一直++的，所以知道已经显示到哪里了
+ 134   3                  //判断第二行是否超出，超出部分舍弃
+ 135   3                  if(second_line_display_cnt>16)
+ 136   3                  {
+ 137   4                      second_line_display_cnt = 16; 
+ 138   4                  }
+ 139   3                  
+ 140   3                  //显示第二行
+ 141   3                  for(i=0;i<second_line_display_cnt;i++)
+ 142   3                  {
+ 143   4                      DisPlay_char(i,1,pstr[temp+i]);//接着没显示完的显示，并且从第二行的第0列显示
+ 144   4                  }
+ 145   3              }
+ 146   2          }   
+ 147   1              else //直接就显示第二行
+ 148   1              {
+ 149   2                      second_line_display_cnt = 16-x;
+ 150   2                      str_len = strlen(pstr);
+ 151   2                      if(second_line_display_cnt>=str_len) //如果显示有多余的
+ 152   2                      {
+ 153   3                              second_line_display_cnt = str_len;//显示长度就直接是字符串长度
+ 154   3                      }
+ 155   2              else//如果显示不下，其实这个else可以不要，因为上面已经计算显示的最大宽度，为了便于理解
+ 156   2              {
+ 157   3                  second_line_display_cnt = second_line_display_cnt;//我就只能显示这么多了
+ 158   3              }
+ 159   2                      
+ 160   2                      for(i=0;i<second_line_display_cnt;i++)
+ 161   2                      {
+ 162   3                              DisPlay_char(x+i,1,pstr[i]);
+ 163   3                      }
+ 164   2              }
+ 165   1              
+ 166   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    562    ----
+   CODE SIZE        =    582    ----
    CONSTANT SIZE    =     27    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =     23      19
+   DATA SIZE        =     23      18
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.
 
 
-C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)
