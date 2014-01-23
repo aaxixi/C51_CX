@@ -58,6 +58,7 @@ void init ()
 }
 
 //这是丢改第一次
+//这是丢改第2次
 
 void DisPlay_char(int x,int y,char ch);
 void Display_str(int x,int y,char* pstr);
