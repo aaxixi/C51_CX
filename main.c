@@ -12,28 +12,44 @@ void delay()
 		for(b=0;b<245;b++);
 	}
 }
-void timeing (i)
+void init_timer0()
 {
-	i=0;
-	while(1)
-	{	
-		i++;
-		delay();
-	}
+	TMOD|=0x01;
+	TH0=0x00;
+	TL0=0x00;
+	EA=1;
+	ET0=1;
+	TR0=1;
 }
 
-//void display (i)
-//{
-//	P2=table1[i];
-//	P0=table2[i];
-//}  
+
+void timer0_server() interrupt 1
+{
+	uint k;
+	k++;
+	TH0=0x00;
+	TL0=0x00;	
+}
+
+
 
 void main()
-{
-	P2=table1[i];
-	P0=table2[i];
-	display();
-	delay();
+{	
+	uint num,k;
+	num=0;
+	init_timer0();
+	while(1)
+	{
+		if(k==20)
+		{
+			
+			k=0;
+			P0=table1[num];
+		    P2=table2[num];
+			num++;
+		}
+	}
+	
 }
 
 
