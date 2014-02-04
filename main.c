@@ -1,6 +1,7 @@
 #include<reg52.h>
 #define uchar unsigned char
 #define uint unsigned int
+uint k;
 unsigned char table1[]={0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f};
 unsigned char table2[]={0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01};
 uint i;
@@ -25,7 +26,7 @@ void init_timer0()
 
 void timer0_server() interrupt 1
 {
-	uint k;
+
 	k++;
 	TH0=0x00;
 	TL0=0x00;	
@@ -35,7 +36,7 @@ void timer0_server() interrupt 1
 
 void main()
 {	
-	uint num,k;
+	uint num;
 	num=0;
 	init_timer0();
 	while(1)
