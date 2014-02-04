@@ -6,7 +6,7 @@ sbit lcd_rs=P2^2;
 sbit lcd_rw=P2^3;
 sbit lcd_en=P2^4;
 
-//modify by cx
+//modify by cx 这是修改测试，即将提交到服务器
 
 uchar table1[]=" i love you ";
 uchar table2[]=" heluyao ";
