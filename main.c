@@ -2,19 +2,20 @@
 #define uchar unsigned char
 #define uint unsigned int
 uint k;
-uint num;
-uint num_hour,num_hour1,num_hou1,num_hou;
-uint num_mine,num_mine1,num_min1,num_min;
-uint num_seco,num_seco1;
-unsigned char table_num[]={0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x40};
-unsigned char table_wei[]={0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01};
-uint i;
+unsigned char g_hour;
+unsigned char g_minute;
+unsigned char g_second;
+
+//加code 是为了让这段数据不占用内存，因为单片机内存有限，而这些数据不用修改在flash中即可
+code unsigned char table_num[]={0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x40};
+code unsigned char table_wei[]={0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01};
+
 void delay()
 {
 	uchar a,b;
-	for(a=0;a<25;a++)
+	for(a=0;a<10;a++)
 	{
-		for(b=0;b<24;b++);
+		for(b=0;b<10;b++);
 	}
 }
 void init_timer0()
@@ -37,68 +38,67 @@ void timer0_server() interrupt 1
 }
 
 
-void display()
+void Count_add(void)
 {
-	num_seco1=num/10;
-	num_seco=num%10;
-	num_min1=num_mine/10;
-	num_min=num_mine%10;
-	num_hou1=num_hour/10;
-	num_hou=num_hour%10;
-	P0=0x40;
-	P2=0x20;
-	delay();
-	P0=0x40;
-	P2=0x04;
-	delay();
-	P0=table_num[num_seco];
-	P2=0x80;
-	delay();
-	P0=table_num[num_seco1];
-	P2=0x40;
-	delay();
-	P0=table_num[num_min];
-	P2=0x10; 
-	delay();
-	P0=table_num[num_min1];
-	P2=0x08;
-	delay();
-	P0=table_num[num_hou];
-	P2=0x02;
-	delay();
-	P0=table_num[num_hou1];
-	P2=0x01;
-	delay();				
+    if(k==80)
+	{
+        k=0;
+        g_second++;
+        //------判断秒是不是到了60
+        if(g_second==60)
+        {
+            g_minute++;
+            g_second = 0;
+            //------判断分是不是到了60
+            if(g_minute==60)
+            {
+                g_minute = 0;
+                g_hour++;
+                if(g_hour==24)
+                {
+                    g_hour = 0;
+                }
+            }
+        }
+        
+        
+    }
 }
+//---------------------------pos:表示显示的位置，num:表示显示的内容
+void display_seg(unsigned char pos,unsigned char num)
+{
+    P2 = table_wei[pos];
+    P0 = table_num[num];
+    delay();
+}
+
+
+void ShowTime(  unsigned char hour,
+                unsigned char minute,
+                unsigned char second
+             )
+{
+    //--------------------------hour
+    display_seg(0,hour/10);
+    display_seg(1,hour%10);
+    display_seg(2,10);
+    //--------------------------minute
+    display_seg(3,minute/10);
+    display_seg(4,minute%10);
+    display_seg(5,10);
+    //--------------------------second
+    display_seg(6,second/10);
+    display_seg(7,second%10);
+    display_seg(5,10);
+}
+
 void main()
 {	
-
-	num=0;
 	init_timer0();
 	while(1)
 	{
-		if(k==80)
-		{
-			
-			k=0;
-			num++;
-			if(num==60)
-			{
-				num=0;
-				num_mine++;
-				if(num_mine==60)
-				{
-					num_mine=0;
-					num_hour++;
-					if(num_hour==24)
-					{
-						num_hour=0;
-					}	
-				}	
-			}
-		}
-
-		display();
+        Count_add();
+		ShowTime(g_hour,g_minute,g_second);
 	}
 	
 }

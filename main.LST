@@ -1,4 +1,4 @@
-C51 COMPILER V9.51   MAIN                                                                  01/23/2014 00:48:14 PAGE 1   
+C51 COMPILER V9.51   MAIN                                                                  02/07/2014 22:53:36 PAGE 1   
 
 
 C51 COMPILER V9.51, COMPILATION OF MODULE MAIN
@@ -8,187 +8,127 @@ COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND OB
 line level    source
 
    1          #include<reg52.h>
-   2          #include<string.h>
-   3          #define uchar unsigned char
-   4          #define uint unsigned int
-   5          sbit lcd_rs=P2^2;
-   6          sbit lcd_rw=P2^3;
-   7          sbit lcd_en=P2^4;
+   2          #define uchar unsigned char
+   3          #define uint unsigned int
+   4          uint k;
+   5          unsigned char g_hour;
+   6          unsigned char g_minute;
+   7          unsigned char g_second;
    8          
-   9          uchar table1[]=" i love you ";
-  10          uchar table2[]=" heluyao ";
-  11          void delay50us(uint t)   //?? 0us
-  12          {
-  13   1          unsigned char a,b;
-  14   1          for(b=t;b>0;b--)
-  15   1              for(a=22;a>0;a--);
-  16   1      }
-  17          
-  18          void writecom(uchar com)
-  19          {
-  20   1              lcd_en=0;
-  21   1              lcd_rs=0;
-  22   1              lcd_rw=0;
-  23   1              P0=com;
-  24   1              delay50us(1);
-  25   1              lcd_en=1;
-  26   1              delay50us(15);
-  27   1              lcd_en=0;
-  28   1      }
-  29          
-  30          void writedate(uchar date)
-  31          {
-  32   1              lcd_en=0;
-  33   1              lcd_rs=1;
-  34   1              lcd_rw=0;
-  35   1              P0=date;
-  36   1              delay50us(1);
-  37   1              lcd_en=1;
-  38   1              delay50us(15);
-  39   1              lcd_en=0;       
-  40   1      }
-  41          
-  42          void init ()
-  43          {
-  44   1              delay50us(300);
-  45   1              writecom(0x38);
-  46   1              delay50us(100);
-  47   1              writecom(0x38);
-  48   1              delay50us(100);
-  49   1              writecom(0x38);
-  50   1              writecom(0x38);
-  51   1              writecom(0x08);
-  52   1              writecom(0x01);
-  53   1          writecom(0x06);
-  54   1              writecom(0x0c);
-  55   1              
-C51 COMPILER V9.51   MAIN                                                                  01/23/2014 00:48:14 PAGE 2   
+   9          //加code 是为了让这段数据不占用内存，因为单片机内存有限，而这些数据不用修改在flash中即可
+  10          code unsigned char table_num[]={0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x40};
+  11          code unsigned char table_wei[]={0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01};
+  12          
+  13          void delay()
+  14          {
+  15   1              uchar a,b;
+  16   1              for(a=0;a<10;a++)
+  17   1              {
+  18   2                      for(b=0;b<10;b++);
+  19   2              }
+  20   1      }
+  21          void init_timer0()
+  22          {
+  23   1              TMOD|=0x01;
+  24   1              TH0=(65536-50000);
+  25   1              TL0=(65536-50000);
+  26   1              EA=1;
+  27   1              ET0=1;
+  28   1              TR0=1;
+  29   1      }
+  30          
+  31          
+  32          void timer0_server() interrupt 1
+  33          {
+  34   1      
+  35   1              k++;
+  36   1              TH0=(65536-50000);
+  37   1              TL0=(65536-50000);      
+  38   1      }
+  39          
+  40          
+  41          void Count_add(void)
+  42          {
+  43   1          if(k==80)
+  44   1              {
+  45   2              k=0;
+  46   2              g_second++;
+  47   2              //------判断秒是不是到了60
+  48   2              if(g_second==60)
+  49   2              {
+  50   3                  g_minute++;
+  51   3                  g_second = 0;
+  52   3                  //------判断分是不是到了60
+  53   3                  if(g_minute==60)
+  54   3                  {
+  55   4                      g_minute = 0;
+C51 COMPILER V9.51   MAIN                                                                  02/07/2014 22:53:36 PAGE 2   
 
-  56   1      }
-  57          
-  58          
-  59          
-  60          void DisPlay_char(int x,int y,char ch);
-  61          void Display_str(int x,int y,char* pstr);
-  62          
-  63          void main()
-  64          {
-  65   1              uchar j;
-  66   1              init();
-  67   1          /*
-  68   1              writecom(0x80);
-  69   1              for(j=0;j<16;j++)
-  70   1      
-  71   1              {
-  72   1                      writedate(table1[j]);
-  73   1                      delay50us(10);
-  74   1              }
-  75   1              writecom(0x80+0x40);
-  76   1              for(j=0;j<16;j++)
-  77   1              {
-  78   1                      writedate(table2[j]);
-  79   1                      delay50us(10);
-  80   1              }
-  81   1          */
-  82   1          Display_str(0,0,"this is test!!!more char!!");
-  83   1          //Display_str(0,0,table1);
-  84   1              while(1);
-  85   1      
-  86   1      }
-*** WARNING C280 IN LINE 65 OF main.c: 'j': unreferenced local variable
-  87          
-  88          
-  89          void DisPlay_char(int x,int y,char ch)
-  90          {
-  91   1              int a=0;
-  92   1              if(y>0)
-  93   1              {
-  94   2                      a = 0x40;
-  95   2              }
-  96   1              a = a+x;
-  97   1              writecom(0x80+a);
-  98   1              writedate(ch);
-  99   1              delay50us(10);
- 100   1      }
- 101          
- 102          //test
- 103          
- 104          void Display_str(int x,int y,char* pstr)
- 105          {
- 106   1              int a=0;
- 107   1              int str_len=0;
- 108   1              int first_line_display_cnt=0;
- 109   1              int second_line_display_cnt=0;
- 110   1              int i=0;
- 111   1              int temp=0;
- 112   1      
- 113   1              if(y==0)
- 114   1              {
- 115   2                      first_line_display_cnt = 16-x;
- 116   2                      str_len = strlen(pstr);
-C51 COMPILER V9.51   MAIN                                                                  01/23/2014 00:48:14 PAGE 3   
-
- 117   2                      if(first_line_display_cnt>=str_len) 
- 118   2                      {
- 119   3                  first_line_display_cnt = str_len;
- 120   3                      }
- 121   2              //显示第一行
- 122   2              for(i=0;i<first_line_display_cnt;i++)
- 123   2              {
- 124   3                  DisPlay_char(x+i,0,pstr[i]);
- 125   3              }
- 126   2              
- 127   2              temp = i;
- 128   2              first_line_display_cnt = 16-x;
- 129   2              str_len = strlen(pstr);
- 130   2              if(first_line_display_cnt<str_len)//一行显示不下
- 131   2              {
- 132   3                  //计算余下多少
- 133   3                  second_line_display_cnt = str_len-temp;//temp就是i是上面一直++的，所以知道已经显示到哪里了
- 134   3                  //判断第二行是否超出，超出部分舍弃
- 135   3                  if(second_line_display_cnt>16)
- 136   3                  {
- 137   4                      second_line_display_cnt = 16; 
- 138   4                  }
- 139   3                  
- 140   3                  //显示第二行
- 141   3                  for(i=0;i<second_line_display_cnt;i++)
- 142   3                  {
- 143   4                      DisPlay_char(i,1,pstr[temp+i]);//接着没显示完的显示，并且从第二行的第0列显示
- 144   4                  }
- 145   3              }
- 146   2          }   
- 147   1              else //直接就显示第二行
- 148   1              {
- 149   2                      second_line_display_cnt = 16-x;
- 150   2                      str_len = strlen(pstr);
- 151   2                      if(second_line_display_cnt>=str_len) //如果显示有多余的
- 152   2                      {
- 153   3                              second_line_display_cnt = str_len;//显示长度就直接是字符串长度
- 154   3                      }
- 155   2              else//如果显示不下，其实这个else可以不要，因为上面已经计算显示的最大宽度，为了便于理解
- 156   2              {
- 157   3                  second_line_display_cnt = second_line_display_cnt;//我就只能显示这么多了
- 158   3              }
- 159   2                      
- 160   2                      for(i=0;i<second_line_display_cnt;i++)
- 161   2                      {
- 162   3                              DisPlay_char(x+i,1,pstr[i]);
- 163   3                      }
- 164   2              }
- 165   1              
- 166   1      }
+  56   4                      g_hour++;
+  57   4                      if(g_hour==24)
+  58   4                      {
+  59   5                          g_hour = 0;
+  60   5                      }
+  61   4                  }
+  62   3              }
+  63   2              
+  64   2              
+  65   2          }
+  66   1      }
+  67          //---------------------------pos:表示显示的位置，num:表示显示的内容
+  68          void display_seg(unsigned char pos,unsigned char num)
+  69          {
+  70   1          P2 = table_wei[pos];
+  71   1          P0 = table_num[num];
+  72   1          delay();
+  73   1      }
+  74          
+  75          
+  76          void ShowTime(  unsigned char hour,
+  77                          unsigned char minute,
+  78                          unsigned char second
+  79                       )
+  80          {
+  81   1          //--------------------------hour
+  82   1          display_seg(0,hour/10);
+  83   1          display_seg(1,hour%10);
+  84   1          display_seg(2,10);
+  85   1          //--------------------------minute
+  86   1          display_seg(3,minute/10);
+  87   1          display_seg(4,minute%10);
+  88   1          display_seg(5,10);
+  89   1          //--------------------------second
+  90   1          display_seg(6,second/10);
+  91   1          display_seg(7,second%10);
+  92   1          display_seg(5,10);
+  93   1      }
+  94          
+  95          void main()
+  96          {       
+  97   1              init_timer0();
+  98   1              while(1)
+  99   1              {
+ 100   2              Count_add();
+ 101   2                      ShowTime(g_hour,g_minute,g_second);
+ 102   2              }
+ 103   1              
+ 104   1      }
+ 105          
+ 106          
+ 107          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    582    ----
-   CONSTANT SIZE    =     27    ----
+   CODE SIZE        =    213    ----
+   CONSTANT SIZE    =     19    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =     23      18
+   DATA SIZE        =      5    ----
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
+C51 COMPILER V9.51   MAIN                                                                  02/07/2014 22:53:36 PAGE 3   
+
 END OF MODULE INFORMATION.
 
 
-C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
